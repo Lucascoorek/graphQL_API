@@ -1,4 +1,5 @@
 import { GraphQLServer } from 'graphql-yoga';
+import uuid from 'uuid/v4';
 
 const users = [
   {
@@ -81,6 +82,12 @@ const typeDefs = `
     post: Post!
   }
 
+  type Mutation {
+    createUser(name: String!, email: String!, age: Int): User!
+    createPost(title: String!, body: String!, published: Boolean!, author: ID!): Post!
+    createComment(text: String!, author: ID!, post: ID!): Comment!
+  }
+
   type User {
     name: String!
     age: Int
@@ -144,6 +151,53 @@ const resolvers = {
       };
     }
   },
+
+  Mutation: {
+    createUser(parent, args, ctx, info) {
+      const emailTaken = users.some(user => user.email === args.email);
+      if (emailTaken) throw new Error('Email taken');
+      const user = {
+        id: uuid(),
+        name: args.name,
+        email: args.email,
+        age: args.age
+      };
+      users.push(user);
+      return user;
+    },
+    createPost(parent, args, ctx, info) {
+      const userExists = users.some(user => user.id === args.author);
+      if (!userExists) throw new Error('User not found');
+      const post = {
+        id: uuid(),
+        title: args.title,
+        body: args.body,
+        published: args.published,
+        author: args.author
+      };
+      posts.push(post);
+      return post;
+    },
+    createComment(parent, args, ctx, info) {
+      const userExists = users.some(user => user.id === args.author);
+      const postExistsAndIsPublished = posts.some(
+        post => post.id === args.post && post.published
+      );
+      if (!userExists || !postExistsAndIsPublished)
+        throw new Error(
+          "User not found or post doesn't exists or is not published"
+        );
+      const comment = {
+        id: uuid(),
+        text: args.text,
+        author: args.author,
+        post: args.post
+      };
+      comments.push(comment);
+      return comment;
+    }
+  },
+
   Post: {
     author(parent, args, ctx, info) {
       return users.find(user => user.id === parent.author);
