@@ -29,7 +29,7 @@ const Mutation = {
       return !match;
     });
     // Delete comments of this user
-    db.comments = db.comments.filter(comment => comment.author !== args.author);
+    db.comments = db.comments.filter(comment => comment.author !== args.id);
 
     // Return deleted User
     return deletedUsers[0];

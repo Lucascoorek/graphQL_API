@@ -24,7 +24,7 @@ const posts = [
     title: 'First Post',
     body: 'This is a First post',
     published: true,
-    author: '2'
+    author: '1'
   },
   {
     id: '2',
@@ -65,7 +65,7 @@ const comments = [
     id: 'Comment4',
     text: 'This is comment 4',
     author: '1',
-    post: '1'
+    post: '2'
   }
 ];
 
